@@ -1,20 +1,6 @@
 import numpy as np
 import random as rd
 
-
-class Chromosome:
-    """
-        Create the chromosome based on the data size
-    """
-
-    @staticmethod
-    def generate_cromossome( size ):
-        l = [ ]
-        for _ in range( size ):
-            l.append( 1 if rd.random( ) > 0.5 else 0 )
-        return l
-
-
 class Individual:
     """
         Class individual
@@ -31,23 +17,21 @@ class Individual:
         self.data = dataset
         self.generation = generation
         self.fitness = 0
-        self.chromosome = Chromosome.generate_cromossome( len( dataset ) )
+        self.chromosome = np.random.choice( [ 0 , 1 ] , size = (len( dataset )) , p = [ 0.5 , 0.5 ] )
 
     def evaluate( self ):
         """
         Evaluates the fitness of the specimen
         counts the 0s and 1s and add them into variables
-        :return: the absolute value of the diference between the number of 0s and 1s
+        :return: the absolute value of the difference between the number of 0s and 1s
         """
-        c1 = 0
-        c2 = 0
-        size = len( self.chromosome )
-        for _ in range( size ):
-            if self.chromosome[ _ ] == 0:
-                c1 += self.data[ _ ]
-            else:
-                c2 += self.data[ _ ]
-        result = abs( c1 - c2 )
+        zero = self.chromosome == 0
+        one = self.chromosome == 1
+
+        c1 = sum( self.data[ zero ] )
+        c2 = sum( self.data[ one ] )
+
+        result = np.abs( c1 - c2 )
         self.fitness = result
 
     def crossover( self , other ):
@@ -57,29 +41,19 @@ class Individual:
         :param other: second individual
         :return: return the children, two new individuals with mixed genes
         """
-        first_cut_point = round( len( self.chromosome ) * 0.25 )
-        second_cut_point = round( len( self.chromosome ) * 0.75 )
-
-        first_son = other.chromosome[ 0:first_cut_point ] + \
-                    self.chromosome[ first_cut_point:second_cut_point ] + \
-                    other.chromosome[ second_cut_point:: ]
-
-        second_son = self.chromosome[ 0:first_cut_point ] + \
-                     other.chromosome[ first_cut_point:second_cut_point ] + \
-                     self.chromosome[ second_cut_point:: ]
+        first_cut = round( len( self.chromosome ) * 0.25 )
+        second_cut = round( len( self.chromosome ) * 0.75 )
 
         offspring = [ Individual( self.data , self.generation + 1 ) , Individual( self.data , self.generation + 1 ) ]
-        offspring[ 0 ].chromosome = first_son
-        offspring[ 1 ].chromosome = second_son
-        return offspring
+        offspring[ 0 ].chromosome[ 0:first_cut ] = other.chromosome[ 0:first_cut ]
+        offspring[ 0 ].chromosome[ first_cut:second_cut ] = self.chromosome[ first_cut:second_cut ]
+        offspring[ 0 ].chromosome[ second_cut: ] = other.chromosome[ second_cut: ]
 
-    #
-    # def func( self, factor ):
-    #     if rd.random( ) < factor:
-    #         if self.chromosome[ i ] == 1:
-    #             self.chromosome[ i ] = 0
-    #         else:
-    #             self.chromosome[ i ] = 1
+        offspring[ 1 ].chromosome[ 0:first_cut ] = self.chromosome[ 0:first_cut ]
+        offspring[ 1 ].chromosome[ first_cut:second_cut ] = other.chromosome[ first_cut:second_cut ]
+        offspring[ 1 ].chromosome[ second_cut: ] = self.chromosome[ second_cut: ]
+
+        return offspring
 
     def mutation( self , factor ):
         """
@@ -87,10 +61,10 @@ class Individual:
         :param factor: the mutation factor
         :return: returns the mutated individual
         """
-        for _ in range( len( self.chromosome ) ):
-            if rd.random( ) < factor:
-                self.chromosome[ _ ] = 1 if self.chromosome[ _ ] == 0 else 0
-        return self
+        v = np.random.choice( [ False , True ] , size = (len( self.chromosome )) , p = [ 1. - factor , factor ] )
+        self.chromosome[ v ] = np.abs( self.chromosome[ v ] - 1 )
+
+        # return self
 
 
 class Population:
@@ -152,7 +126,7 @@ class Population:
 
 
 def gera_dados( ):
-    return np.arange( 1 , 40001 , 1 )
+    return np.arange( 1 , 1000001 , 1 )
     # return np.random.randint( low = 1 , high = 1000001 , size = 1000000 )
 
 
@@ -166,19 +140,17 @@ def print_fitness( ):
 def print_result( npop ):
     print( "\nGeneration: " , npop.population[ 0 ].generation )
     print( "Best fit: " , npop.best_solution.fitness )
-    # print( "Chromosome: " , pop.best_solution.chromosome )
-    # print( "Data: " , pop.population[ 0 ].data )
 
 
 data = gera_dados( )
 
-pop = Population( 30 )
+pop = Population( 15 )
 pop.create_population( data )
 pop.evaluate_population( )
 pop.sort_population( )
 pop.best_individual( pop.population[ 0 ] )
 print_result( pop )
-print_fitness( )
+# print_fitness( )
 
 generations = 20
 for _ in range( generations ):
@@ -187,7 +159,7 @@ for _ in range( generations ):
     pop.sort_population( )
     pop.best_individual( pop.population[ 0 ] )
     print_result( pop )
-    print_fitness( )
+    # print_fitness( )
 
 print( len( data ) / 4 )
 print( "Fim" )
