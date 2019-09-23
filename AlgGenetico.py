@@ -152,7 +152,7 @@ class Population:
 
 
 def gera_dados( ):
-    return np.arange( 1 , 321 , 1 )
+    return np.arange( 1 , 40001 , 1 )
     # return np.random.randint( low = 1 , high = 1000001 , size = 1000000 )
 
 
@@ -163,9 +163,9 @@ def print_fitness( ):
     print( "Fitness: " , fitness )
 
 
-def print_result( pop ):
-    print( "\nGeneration: " , pop.population[ 0 ].generation )
-    print( "Best fit: " , pop.best_solution.fitness )
+def print_result( npop ):
+    print( "\nGeneration: " , npop.population[ 0 ].generation )
+    print( "Best fit: " , npop.best_solution.fitness )
     # print( "Chromosome: " , pop.best_solution.chromosome )
     # print( "Data: " , pop.population[ 0 ].data )
 
