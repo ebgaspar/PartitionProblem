@@ -11,8 +11,8 @@ class Chromosome:
     def generate_cromossome( size ):
         l = [ ]
         for _ in range( size ):
-            l.append( 1 if np.random.random( ) > 0.5 else 0 )
-        return  l
+            l.append( 1 if rd.random( ) > 0.5 else 0 )
+        return l
 
 
 class Individual:
@@ -73,18 +73,23 @@ class Individual:
         offspring[ 1 ].chromosome = second_son
         return offspring
 
+    #
+    # def func( self, factor ):
+    #     if rd.random( ) < factor:
+    #         if self.chromosome[ i ] == 1:
+    #             self.chromosome[ i ] = 0
+    #         else:
+    #             self.chromosome[ i ] = 1
+
     def mutation( self , factor ):
         """
         Executes the mutations on the genes by randomly changing it at random based on a factor
         :param factor: the mutation factor
         :return: returns the mutated individual
         """
-        for i in range( len( self.chromosome ) ):
+        for _ in range( len( self.chromosome ) ):
             if rd.random( ) < factor:
-                if self.chromosome[ i ] == 1:
-                    self.chromosome[ i ] = 0
-                else:
-                    self.chromosome[ i ] = 1
+                self.chromosome[ _ ] = 1 if self.chromosome[ _ ] == 0 else 0
         return self
 
 
@@ -147,8 +152,9 @@ class Population:
 
 
 def gera_dados( ):
-    return np.arange( 1 , 1000000 , 1 )
+    return np.arange( 1 , 321 , 1 )
     # return np.random.randint( low = 1 , high = 1000001 , size = 1000000 )
+
 
 def print_fitness( ):
     fitness = [ ]
@@ -183,4 +189,5 @@ for _ in range( generations ):
     print_result( pop )
     print_fitness( )
 
+print( len( data ) / 4 )
 print( "Fim" )
